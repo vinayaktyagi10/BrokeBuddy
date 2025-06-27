@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import List, Dict
 import httpx
 from app.routes.auth import get_current_user  # JWT user auth
+from app.schemas.advice import ChatRequest
 
 router = APIRouter()
 OLLAMA_URL = "http://localhost:11434/api/chat"
@@ -24,21 +25,10 @@ Keep replies short (2–4 lines), witty, and casual. Always act like a friend, n
 
 @router.post("/advice")
 async def chat_with_llama(
-    messages: List[Dict[str, str]] = Body(...),
+    messages: List[Dict[str, str]],
     user: dict = Depends(get_current_user)
 ):
-    """
-    messages: Chat-style history. Format:
-    [
-        { "role": "system", "content": "context here" },
-        { "role": "user", "content": "what should I save?" },
-        { "role": "assistant", "content": "You should avoid subscriptions." },
-        ...
-    ]
-    """
-
     full_messages = [{"role": "system", "content": BANK_CONTEXT}] + messages
-
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(OLLAMA_URL, json={
@@ -46,10 +36,9 @@ async def chat_with_llama(
                 "messages": full_messages,
                 "stream": False
             })
-
-        if response.status_code != 200:
-            print("❌ Ollama response error:", response.status_code, response.text)
-            raise HTTPException(status_code=500, detail="LLM response failed")
+        return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
         return response.json()
 

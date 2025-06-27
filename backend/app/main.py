@@ -2,10 +2,15 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
+
+from app.routes import auth, advice  # ✅ Import your routers
 
 # --- FastAPI App Initialization ---
-app = FastAPI(title="BrokeBuddy Backend", description="AI + Plaid Powered Finance Advice API")
+app = FastAPI(
+    title="BrokeBuddy Backend",
+    description="AI + Plaid Powered Finance Advice API"
+)
 
 # --- CORS Setup ---
 app.add_middleware(
@@ -16,15 +21,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- OAuth2 Setup (JWT-based auth) ---
+# ✅ Include Routers AFTER creating `app`
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+app.include_router(advice.router, prefix="", tags=["Advice"])
+
+# --- OAuth2 Setup ---
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 # --- Dummy Auth Dependency ---
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    # Here you would decode JWT and fetch user info from DB
-    return {"username": "test_user"}  # For demo purposes
+    return {"username": "test_user"}
 
-# --- Advice Endpoint ---
+# --- Advice Endpoint (optional: can be removed if advice router handles it) ---
 @app.get("/advice")
 def get_advice(user: dict = Depends(get_current_user)):
     return {
@@ -32,17 +40,33 @@ def get_advice(user: dict = Depends(get_current_user)):
         "message": "Try saving 20% of your income this month!"
     }
 
-# --- Transactions Endpoint (Placeholder for Plaid) ---
 class Transaction(BaseModel):
-    id: int
-    description: str
+    date: str
+    name: str
     amount: float
+    category: Optional[List[str]] = []
 
+
+    
 @app.get("/transactions", response_model=List[Transaction])
 def get_transactions(user: dict = Depends(get_current_user)):
-    # This is where you'd fetch real transactions from Plaid for the logged-in user
     return [
-        {"id": 1, "description": "Coffee", "amount": -120},
-        {"id": 2, "description": "Salary", "amount": 15000},
-        {"id": 3, "description": "Uber", "amount": -350}
+        {
+            "date": "2025-06-01",
+            "name": "Coffee",
+            "amount": -120,
+            "category": ["Food & Drink"]
+        },
+        {
+            "date": "2025-06-02",
+            "name": "Salary",
+            "amount": 15000,
+            "category": ["Income"]
+        },
+        {
+            "date": "2025-06-03",
+            "name": "Uber",
+            "amount": -350,
+            "category": ["Transport"]
+        }
     ]
