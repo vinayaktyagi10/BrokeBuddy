@@ -10,7 +10,7 @@ router = APIRouter()
 fake_users_db = {}
 
 # Secret and settings
-SECRET_KEY = "secret-hackathon-key"  # CHANGE THIS in production
+SECRET_KEY=os.getenv("JWT_SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
