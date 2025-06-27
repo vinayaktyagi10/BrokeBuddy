@@ -3,14 +3,18 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+from app.db.database import cursor, conn  # ✅ fixed
+from pydantic import BaseModel
 
+load_dotenv()
 router = APIRouter()
 
-# Dummy user storage
-fake_users_db = {}
-
 # Secret and settings
-SECRET_KEY=os.getenv("JWT_SECRET_KEY")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("Secret_KEY is not set")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -35,7 +39,11 @@ def get_password_hash(password):
 
 
 def get_user(username: str):
-    return fake_users_db.get(username)
+    cursor.execute("SELECT username, password_hash FROM users WHERE username = ?", (username,))
+    row = cursor.fetchone()
+    if row:
+        return {"username": row[0], "hashed_password": row[1]}
+    return None
 
 
 def authenticate_user(username: str, password: str):
@@ -47,12 +55,23 @@ def authenticate_user(username: str, password: str):
 
 # Routes
 
+class SignupRequest(BaseModel):
+    username: str
+    password: str
+
 @router.post("/signup")
-def signup(username: str, password: str):
-    if username in fake_users_db:
+def signup(data: SignupRequest):
+    username = data.username
+    password = data.password
+
+    cursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
+    if cursor.fetchone():
         raise HTTPException(status_code=400, detail="Username already exists.")
+
     hashed = get_password_hash(password)
-    fake_users_db[username] = {"username": username, "hashed_password": hashed}
+    cursor.execute("INSERT INTO users (username, password_hash) VALUES (?, ?)", (username, hashed))
+    conn.commit()
+
     return {"msg": "User created successfully."}
 
 

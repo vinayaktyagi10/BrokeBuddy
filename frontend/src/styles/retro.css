@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --neon-blue: #0ff0fc;
+  --neon-pink: #ff2ced;
+  --neon-purple: #9600ff;
+  --neon-green: #00ff7f;
+  --dark-bg: #0a0a12;
+  --darker-bg: #050508;
+  --pixel-size: 2px;
+}
+
+body {
+  background-color: var(--dark-bg);
+  background-image:
+    linear-gradient(rgba(10, 10, 18, 0.8) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 10, 18, 0.8) 1px, transparent 1px);
+  background-size: 20px 20px;
+  font-family: 'Press Start 2P', cursive;
+  color: #e0e0ff;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container,
+.signup-container {
+  width: 90%;
+  max-width: 400px;
+  padding: 30px;
+  border: var(--pixel-size) solid var(--neon-purple);
+  box-shadow:
+    0 0 10px var(--neon-purple),
+    0 0 20px rgba(150, 0, 255, 0.3);
+  background-color: var(--darker-bg);
+  position: relative;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+  color: var(--neon-blue);
+  text-shadow: 0 0 5px var(--neon-blue);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: var(--neon-green);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--darker-bg);
+  border: var(--pixel-size) solid var(--neon-pink);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.7rem;
+  color: var(--neon-blue);
+  outline: none;
+  box-sizing: border-box;
+}
+
+input:focus {
+  box-shadow: 0 0 10px var(--neon-pink);
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin: 20px 0;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.8rem;
+  text-align: center;
+  background-color: var(--neon-pink);
+  color: black;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--neon-green);
+  animation: glitch 0.3s linear;
+}
+
+.btn:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+.link-btn {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.65rem;
+  background: none;
+  border: none;
+  color: var(--neon-blue);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.link-btn:hover {
+  text-shadow: 0 0 5px var(--neon-blue);
+}
+
+.error-message {
+  font-size: 0.7rem;
+  color: red;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Glitch effect */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+
+.action-btn {
+  width: 100%;
+  padding: 20px;
+  background-color: #050508;
+  border: 2px solid #9600ff;
+  color: #0ff0fc;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  line-height: 1.4;
+  position: relative;
+}
+
+.action-btn:hover {
+  background-color: #9600ff;
+  color: white;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px #ff2ced;
+}
+
+/* Pixel corners */
+.action-btn::before,
+.action-btn::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #00ff7f;
+}
+
+.action-btn::before {
+  top: -4px;
+  left: -4px;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.action-btn::after {
+  bottom: -4px;
+  right: -4px;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
