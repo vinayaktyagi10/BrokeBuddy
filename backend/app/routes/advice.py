@@ -25,22 +25,23 @@ Keep replies short (2–4 lines), witty, and casual. Always act like a friend, n
 
 @router.post("/advice")
 async def chat_with_llama(
-    messages: List[Dict[str, str]],
+    request: ChatRequest,
     user: dict = Depends(get_current_user)
 ):
-    full_messages = [{"role": "system", "content": BANK_CONTEXT}] + messages
+    full_messages = [
+        {"role": "system", "content": BANK_CONTEXT}
+    ] + [msg.dict() for msg in request.messages]
+
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.post(OLLAMA_URL, json={
+            res = await client.post(OLLAMA_URL, json={
                 "model": "llama3",
                 "messages": full_messages,
                 "stream": False
             })
-        return response.json()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-        return response.json()
+        llama_response = res.json()
+        content = llama_response.get("message", {}).get("content", "No response from Llama.")
+        return {"message": content}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

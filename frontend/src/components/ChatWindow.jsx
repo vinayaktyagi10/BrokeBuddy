@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../styles/retro.css'; // Optional: add styles here
+import '../styles/retro.css'; // optional
 
 export default function ChatWindow({ onClose, chatHistory = [], setChatHistory }) {
   const [input, setInput] = useState('');
@@ -17,8 +17,10 @@ export default function ChatWindow({ onClose, chatHistory = [], setChatHistory }
     setLoading(true);
 
     try {
-	const res = await axios.post('http://localhost:8000/advice', { messages: updatedMessages }, 
-	{
+      const res = await axios.post(
+        'http://localhost:8000/advice',
+        { messages: newMessages }, // ✅ this matches ChatRequest in FastAPI
+        {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -31,6 +33,7 @@ export default function ChatWindow({ onClose, chatHistory = [], setChatHistory }
 
       setChatHistory([...newMessages, { role: 'assistant', content: reply }]);
     } catch (err) {
+      console.error('❌ Axios error:', err.response?.data || err.message);
       setChatHistory([
         ...newMessages,
         { role: 'assistant', content: '⚠️ Something went wrong.' },

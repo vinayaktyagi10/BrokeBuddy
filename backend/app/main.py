@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
@@ -33,12 +33,32 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     return {"username": "test_user"}
 
 # --- Advice Endpoint (optional: can be removed if advice router handles it) ---
-@app.get("/advice")
-def get_advice(user: dict = Depends(get_current_user)):
-    return {
-        "username": user["username"],
-        "message": "Try saving 20% of your income this month!"
-    }
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    messages: List[ChatMessage]
+
+@app.post("/advice")
+async def chat_with_llama(
+    chat: ChatRequest = Body(...),
+    user: dict = Depends(get_current_user)
+):
+    full_messages = [{"role": "system", "content": "You're BrokeBuddy, a Gen Z money coach. Be casual."}] + [
+        msg.dict() for msg in chat.messages
+    ]
+
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.post("http://localhost:11434/api/chat", json={
+                "model": "llama3",
+                "messages": full_messages,
+                "stream": False
+            })
+        return res.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 class Transaction(BaseModel):
     date: str
