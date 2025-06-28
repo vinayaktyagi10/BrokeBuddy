@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/retro.css';
 import ChatWindow from '../components/ChatWindow';
 import { useNavigate } from 'react-router-dom';
+import ForecastChart from '../components/ForecastChart';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+
   const [chatHistory, setChatHistory] = useState([]);
   const [showChat, setShowChat] = useState(false);
+  const [forecast, setForecast] = useState([]);
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -21,16 +24,13 @@ export default function Dashboard() {
     try {
       switch (type) {
         case 'ADVICE':
-          // Show chat window
           setShowChat(true);
-
-          // Initial message
           const firstMsg = {
             role: 'user',
             content: 'Give me advice on managing money as a college student',
           };
 
-          const res = await axios.post(
+          const adviceRes = await axios.post(
             'http://localhost:8000/advice',
             { messages: [firstMsg] },
             {
@@ -41,8 +41,7 @@ export default function Dashboard() {
             }
           );
 
-          const reply = res.data.response || res.data.message || 'No advice returned.';
-
+          const reply = adviceRes.data.response || adviceRes.data.message || 'No advice returned.';
           setChatHistory([
             { role: 'user', content: firstMsg.content },
             { role: 'assistant', content: reply },
@@ -50,7 +49,17 @@ export default function Dashboard() {
           break;
 
         case 'FORECAST':
-          alert('Forecast feature coming soon...');
+          const forecastRes = await axios.post(
+            'http://localhost:8000/forecast',
+            {}, // you can pass user data if needed
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          setForecast(forecastRes.data);
           break;
 
         case 'RISK':
@@ -96,6 +105,13 @@ export default function Dashboard() {
             chatHistory={chatHistory}
             setChatHistory={setChatHistory}
           />
+        )}
+
+        {forecast.length > 0 && (
+          <div>
+            <h2>30-Day Expense Forecast</h2>
+            <ForecastChart forecastData={forecast} />
+          </div>
         )}
       </main>
 
