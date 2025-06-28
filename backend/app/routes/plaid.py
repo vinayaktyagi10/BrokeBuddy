@@ -23,9 +23,9 @@ async def create_link_token(current_user: dict = Depends(get_current_user)):
     
     try:
         request = LinkTokenCreateRequest(
-            products=[Products('transactions')],  # Request transactions product
+            products=[Products.transactions],  # Fixed: Use Products.transactions
             client_name="BrokeBuddy Finance App",
-            country_codes=[CountryCode('US')],  # Add more countries as needed
+            country_codes=[CountryCode.US],  # Fixed: Use CountryCode.US
             language='en',
             user=LinkTokenCreateRequestUser(client_user_id=str(current_user['user_id']))
         )
