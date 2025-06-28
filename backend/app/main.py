@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Depends, Body
+from fastapi import FastAPI, Depends, Body, HTTPException
+import httpx
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from typing import List, Optional
 
-from app.routes import auth, advice  # ✅ Import your routers
+from app.routes import auth, advice, forecast  # ✅ Import your routers
+from app.utils.auth_utils import get_current_user
 
 # --- FastAPI App Initialization ---
 app = FastAPI(
@@ -24,13 +26,11 @@ app.add_middleware(
 # ✅ Include Routers AFTER creating `app`
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(advice.router, prefix="", tags=["Advice"])
+app.include_router(forecast.router, prefix="/forecast", tags=["Forecast"])
 
 # --- OAuth2 Setup ---
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-# --- Dummy Auth Dependency ---
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    return {"username": "test_user"}
 
 # --- Advice Endpoint (optional: can be removed if advice router handles it) ---
 class ChatMessage(BaseModel):
@@ -90,3 +90,7 @@ def get_transactions(user: dict = Depends(get_current_user)):
             "category": ["Transport"]
         }
     ]
+
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}

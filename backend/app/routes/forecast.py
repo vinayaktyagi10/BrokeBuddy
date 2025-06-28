@@ -1,14 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from typing import List
+from app.schemas.forecast import Transaction, ForecastResponse
+from app.services.forecast_service import forecast_expenses
+from app.routes.auth import get_current_user
 
 router = APIRouter()
 
-@router.get("/forecast")
-def get_forecast():
-    return [{"month": "June", "spend": 14000}, {"month": "July", "spend": 15500}]
-
-@router.get("/risk")
-def get_risk():
-    return {
-        "message": "You're on track to overspend ₹5,000 this month",
-        "suggestion": "Try pausing subscriptions or reduce Zomato orders"
-    }
+@router.post("/", response_model=ForecastResponse)
+async def get_forecast(
+    transactions: List[Transaction],
+    user: dict = Depends(get_current_user)
+):
+    return forecast_expenses(transactions)
