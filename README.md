@@ -4,6 +4,12 @@ BrokeBuddy is a chat-first, AI-powered financial sidekick that helps users manag
 
 🧠 It uses **LLaMA 3 via Ollama** on the backend and provides an interactive chat interface built with React.
 
+![Login Screen](shot_1751027692.png)  
+*Figure 1: User Login Interface*
+
+![Account Creation](shot_1751027701.png)  
+*Figure 2: New User Registration*
+
 ---
 
 ## 👨‍💻 Built By
@@ -71,13 +77,26 @@ Frontend runs at: http://localhost:5173
 ---
 
 ## 💬 Chat Features
+https://1.png
+Figure 3: Main Dashboard with Financial Options
 
+https://2.png
+Figure 4: Sample Conversation with Financial Advice
 - Ask BrokeBuddy for financial tips
 - Friendly tone + casual replies
 - Stateless messages (currently)
 - Backend integration with Ollama AI
 
 ---
+##📊 Forecasting Features
+https://3.png
+*Figure 5: 30-Day Spending Forecast Visualization*
+
+AI-powered spending predictions
+
+Visual chart representation
+
+Monthly budget tracking
 
 ## 📂 Project Structure
 
@@ -119,7 +138,6 @@ Feel free to fork, play around, or suggest improvements!
 
 ## 🧠 Future Work
 
-- 🧮 Forecasting feature (AI-based)
 - 💳 Plaid integration
 - 💾 Chat history memory
 - 📈 Visual charts and analytics
