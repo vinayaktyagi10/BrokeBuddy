@@ -77,11 +77,10 @@ Frontend runs at: http://localhost:5173
 ---
 
 ## 💬 Chat Features
-https://1.png
-Figure 3: Main Dashboard with Financial Options
+![Figure 3: Main Dashboard with Financial Options](1.png)
 
-https://2.png
-Figure 4: Sample Conversation with Financial Advice
+![Figure 4: Sample Conversation with Financial Advice](2.png)
+
 - Ask BrokeBuddy for financial tips
 - Friendly tone + casual replies
 - Stateless messages (currently)
@@ -89,8 +88,8 @@ Figure 4: Sample Conversation with Financial Advice
 
 ---
 ##📊 Forecasting Features
-https://3.png
-*Figure 5: 30-Day Spending Forecast Visualization*
+![Figure 5: 30-Day Spending Forecast Visualization](3.png)
+
 
 AI-powered spending predictions
 
