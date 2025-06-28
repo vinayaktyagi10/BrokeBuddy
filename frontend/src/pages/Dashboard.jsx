@@ -10,12 +10,41 @@ export default function Dashboard() {
 
   const [chatHistory, setChatHistory] = useState([]);
   const [showChat, setShowChat] = useState(false);
-  const [forecast, setForecast] = useState([]);
+  const [forecast, setForecast] = useState(null);
+  const [loadingForecast, setLoadingForecast] = useState(false);
 
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
+
+  const fetchForecast = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      setLoadingForecast(true);
+      const res = await axios.post(
+        'http://localhost:8000/forecast',
+	null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setForecast(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load forecast: " + (err.response?.data?.detail || err.message));
+    } finally {
+      setLoadingForecast(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchForecast(); // fetch on load
+  }, []);
 
   const handleAction = async (type) => {
     const token = localStorage.getItem('token');
@@ -49,17 +78,7 @@ export default function Dashboard() {
           break;
 
         case 'FORECAST':
-          const forecastRes = await axios.post(
-            'http://localhost:8000/forecast',
-            {}, // you can pass user data if needed
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          setForecast(forecastRes.data);
+          fetchForecast(); // also allow button to refresh
           break;
 
         case 'RISK':
@@ -107,10 +126,16 @@ export default function Dashboard() {
           />
         )}
 
-        {forecast.length > 0 && (
-          <div>
-            <h2>30-Day Expense Forecast</h2>
-            <ForecastChart forecastData={forecast} />
+        {loadingForecast && (
+          <div className="text-center text-lg font-medium mt-8">Loading forecast...</div>
+        )}
+
+        {forecast && forecast.dailyBreakdown?.length > 0 && (
+          <div className="mt-8">
+            <div className="text-center text-xl font-bold mb-2">
+              Total Forecasted Spend: ₹{forecast.totalForecast}
+            </div>
+            <ForecastChart forecastData={forecast.dailyBreakdown} />
           </div>
         )}
       </main>
