@@ -255,3 +255,104 @@ input:focus {
   padding: 6px 10px;
   cursor: pointer;
 }
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: var(--darker-bg);
+  border-bottom: 2px solid var(--neon-purple);
+  z-index: 100;
+}
+
+.app-name {
+  font-size: 1.2rem;
+  color: var(--neon-blue);
+  text-shadow: 0 0 5px var(--neon-blue);
+}
+
+.logout-btn {
+  background: var(--neon-pink);
+  color: black;
+  border: none;
+  padding: 8px 15px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: var(--neon-green);
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0px var(--neon-pink);
+}
+
+.main-content {
+  margin-top: 80px;
+  padding: 30px;
+  min-height: calc(100vh - 160px);
+}
+
+.welcome-text {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 40px;
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto 40px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 10px;
+  background: var(--darker-bg);
+  border-top: 1px solid var(--neon-purple);
+  font-size: 0.5rem;
+  color: #666;
+}
+
+.close-btn {
+  background: #ff2ced;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-size: 0.6rem;
+}
+
+/* Chart container */
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}

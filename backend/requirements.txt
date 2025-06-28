@@ -3,3 +3,8 @@ uvicorn
 plaid-python
 httpx
 python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+prophet
+pandas
+numpy
