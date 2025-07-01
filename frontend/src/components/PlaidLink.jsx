@@ -17,7 +17,7 @@ const PlaidLink = ({ onSuccess, user }) => {
           return;
         }
 
-        const response = await axios.get('http://localhost:8000/plaid/link-token', {
+        const response = await axios.get('/plaid/link-token', {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ const PlaidLink = ({ onSuccess, user }) => {
         const token = localStorage.getItem('token');
         
         const response = await axios.post(
-          'http://localhost:8000/plaid/exchange-token',
+          '/plaid/exchange-token',
           { public_token },
           { 
             headers: { 

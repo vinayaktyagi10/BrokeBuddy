@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/retro.css'; 
@@ -10,17 +10,21 @@ export default function LoginPage({setToken}) {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
-
+  useEffect(() => {
+	  if(localStorage.getItem('token')) {
+		  navigate('/dashboard');
+	  }
+  }, []);
   const handleAuth = async (e) => {
     e.preventDefault();
     try {
       if (isSignup) {
-        await axios.post('http://localhost:8000/auth/signup', { username, password });
+        await axios.post('/auth/signup', { username, password });
         setIsSignup(false);
         setError('');
       } else {
         const res = await axios.post(
-          'http://localhost:8000/auth/login',
+          '/auth/login',
           new URLSearchParams({ username, password }),
           {
             headers: {

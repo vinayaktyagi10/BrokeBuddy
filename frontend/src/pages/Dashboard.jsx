@@ -30,7 +30,7 @@ export default function Dashboard() {
     try {
       setLoadingTransactions(true);
       const res = await axios.post(
-        'http://localhost:8000/plaid/transactions',
+        '/plaid/transactions',
         { days_back: 365 },
         {
           headers: {
@@ -64,7 +64,7 @@ export default function Dashboard() {
     try {
       setLoadingForecast(true);
       const res = await axios.post(
-        'http://localhost:8000/forecast/',
+        '/forecast/',
         transactions, // Use real transactions instead of dummy data
         {
           headers: {
@@ -90,7 +90,7 @@ export default function Dashboard() {
     try {
       setLoadingForecast(true);
       const res = await axios.post(
-        'http://localhost:8000/forecast/',
+        '/forecast/',
         [
           // Send dummy transactions as the endpoint expects a List[Transaction]
           { date: "2025-06-01", name: "Coffee", amount: -120, category: ["Food & Drink"] },
@@ -132,7 +132,7 @@ export default function Dashboard() {
           };
 
           const adviceRes = await axios.post(
-            'http://localhost:8000/advice',
+            '/advice',
             { messages: [firstMsg] },
             {
               headers: {
@@ -167,7 +167,7 @@ export default function Dashboard() {
             fetchRealTransactions();
           } else {
             // Show dummy transactions
-            const txRes = await axios.get('http://localhost:8000/transactions', {
+            const txRes = await axios.get('/transactions', {
               headers: { Authorization: `Bearer ${token}` },
             });
             alert(`You have ${txRes.data.length} dummy transactions. Connect your bank for real data!`);

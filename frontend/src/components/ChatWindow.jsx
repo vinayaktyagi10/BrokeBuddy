@@ -18,7 +18,7 @@ export default function ChatWindow({ onClose, chatHistory = [], setChatHistory }
 
     try {
       const res = await axios.post(
-        'http://localhost:8000/advice',
+        '/advice',
         { messages: newMessages }, // ✅ this matches ChatRequest in FastAPI
         {
           headers: {

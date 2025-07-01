@@ -5,7 +5,7 @@ import App from './App';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: '/',
   headers: {
     // If you’re using auth, insert the token dynamically
     // Otherwise remove this line
