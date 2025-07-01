@@ -8,3 +8,4 @@ passlib[bcrypt]
 prophet
 pandas
 numpy
+python-multipart
