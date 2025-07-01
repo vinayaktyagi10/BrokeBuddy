@@ -3,26 +3,35 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/retro.css'; 
 
-export default function LoginPage({setToken}) {
+export default function LoginPage({ setToken }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isSignup, setIsSignup] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  useEffect(() => {
-	  if(localStorage.getItem('token')) {
-		  navigate('/dashboard');
-	  }
-  }, []);
+
+  // Remove the useEffect that redirects on mount - let App.jsx handle routing
+  // useEffect(() => {
+  //   if(localStorage.getItem('token')) {
+  //     navigate('/dashboard');
+  //   }
+  // }, []);
+
   const handleAuth = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
       if (isSignup) {
+        // Sign up flow
         await axios.post('/auth/signup', { username, password });
         setIsSignup(false);
-        setError('');
+        setError('Account created! Please login.');
       } else {
+        // Login flow
         const res = await axios.post(
           '/auth/login',
           new URLSearchParams({ username, password }),
@@ -32,14 +41,24 @@ export default function LoginPage({setToken}) {
             },
           }
         );
-        localStorage.setItem('token', res.data.access_token);
-        setToken(res.data.access_token); // ✅ update parent state directly
+        
+        const accessToken = res.data.access_token;
+        
+        // Store token in localStorage
+        localStorage.setItem('token', accessToken);
+        
+        // Update parent state
+        setToken(accessToken);
+        
+        // Navigate to dashboard
         navigate('/dashboard');
-        setError('');
       }
     } catch (err) {
-      const detail = err.response?.data?.detail;
-      setError(detail || 'Something went wrong');
+      console.error('Auth error:', err);
+      const detail = err.response?.data?.detail || 'Authentication failed';
+      setError(detail);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,6 +75,7 @@ export default function LoginPage({setToken}) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
 
@@ -67,6 +87,7 @@ export default function LoginPage({setToken}) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
 
@@ -77,6 +98,7 @@ export default function LoginPage({setToken}) {
               type="password"
               id="confirm"
               required
+              disabled={loading}
               onChange={(e) => {
                 if (e.target.value !== password) {
                   setError('Passwords do not match');
@@ -88,8 +110,8 @@ export default function LoginPage({setToken}) {
           </div>
         )}
 
-        <button type="submit" className="btn">
-          {isSignup ? 'SIGN UP' : 'LOGIN'}
+        <button type="submit" className="btn" disabled={loading}>
+          {loading ? 'PROCESSING...' : (isSignup ? 'SIGN UP' : 'LOGIN')}
         </button>
       </form>
 
@@ -99,14 +121,28 @@ export default function LoginPage({setToken}) {
         {isSignup ? (
           <>
             ALREADY A USER?{' '}
-            <button onClick={() => setIsSignup(false)} className="link-btn">
+            <button 
+              onClick={() => {
+                setIsSignup(false);
+                setError('');
+              }} 
+              className="link-btn"
+              disabled={loading}
+            >
               LOGIN HERE
             </button>
           </>
         ) : (
           <>
             NOT A USER?{' '}
-            <button onClick={() => setIsSignup(true)} className="link-btn">
+            <button 
+              onClick={() => {
+                setIsSignup(true);
+                setError('');
+              }} 
+              className="link-btn"
+              disabled={loading}
+            >
               CREATE ACCOUNT
             </button>
           </>

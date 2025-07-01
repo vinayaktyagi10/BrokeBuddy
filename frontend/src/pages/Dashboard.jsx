@@ -15,17 +15,26 @@ export default function Dashboard() {
   const [loadingForecast, setLoadingForecast] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
-  const [bankConnected, setBankConnected] = useState(false); // Track if bank is connected
+  const [bankConnected, setBankConnected] = useState(false);
 
   const logout = () => {
+    // Clear token from localStorage
     localStorage.removeItem('token');
+    
+    // Trigger storage event manually for same-tab updates
+    window.dispatchEvent(new Event('storage'));
+    
+    // Navigate to login
     navigate('/login');
   };
 
   // Fetch real transactions from Plaid
   const fetchRealTransactions = async () => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      logout();
+      return;
+    }
 
     try {
       setLoadingTransactions(true);
@@ -44,7 +53,11 @@ export default function Dashboard() {
       alert(`Loaded ${res.data.transactions.length} real transactions!`);
     } catch (err) {
       console.error(err);
-      alert("Failed to load transactions: " + (err.response?.data?.detail || err.message));
+      if (err.response?.status === 401) {
+        logout();
+      } else {
+        alert("Failed to load transactions: " + (err.response?.data?.detail || err.message));
+      }
     } finally {
       setLoadingTransactions(false);
     }
@@ -53,9 +66,11 @@ export default function Dashboard() {
   // Generate forecast with real transaction data
   const fetchForecastWithRealData = async () => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      logout();
+      return;
+    }
 
-    // Check if we have real transactions
     if (transactions.length === 0) {
       alert('Please connect your bank and fetch transaction history first!');
       return;
@@ -65,7 +80,7 @@ export default function Dashboard() {
       setLoadingForecast(true);
       const res = await axios.post(
         '/forecast/',
-        transactions, // Use real transactions instead of dummy data
+        transactions,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -76,23 +91,29 @@ export default function Dashboard() {
       setForecast(res.data);
     } catch (err) {
       console.error(err);
-      alert("Failed to load forecast: " + (err.response?.data?.detail || err.message));
+      if (err.response?.status === 401) {
+        logout();
+      } else {
+        alert("Failed to load forecast: " + (err.response?.data?.detail || err.message));
+      }
     } finally {
       setLoadingForecast(false);
     }
   };
 
-  // Fallback forecast with dummy data (for demo purposes)
+  // Fallback forecast with dummy data
   const fetchForecast = async () => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      logout();
+      return;
+    }
 
     try {
       setLoadingForecast(true);
       const res = await axios.post(
         '/forecast/',
         [
-          // Send dummy transactions as the endpoint expects a List[Transaction]
           { date: "2025-06-01", name: "Coffee", amount: -120, category: ["Food & Drink"] },
           { date: "2025-06-02", name: "Uber", amount: -350, category: ["Transport"] },
           { date: "2025-06-03", name: "Subway", amount: -200, category: ["Food & Drink"] },
@@ -108,19 +129,26 @@ export default function Dashboard() {
       setForecast(res.data);
     } catch (err) {
       console.error(err);
-      alert("Failed to load forecast: " + (err.response?.data?.detail || err.message));
+      if (err.response?.status === 401) {
+        logout();
+      } else {
+        alert("Failed to load forecast: " + (err.response?.data?.detail || err.message));
+      }
     } finally {
       setLoadingForecast(false);
     }
   };
 
   useEffect(() => {
-    fetchForecast(); // fetch dummy forecast on load
+    fetchForecast();
   }, []);
 
   const handleAction = async (type) => {
     const token = localStorage.getItem('token');
-    if (!token) return alert('Not logged in');
+    if (!token) {
+      logout();
+      return;
+    }
 
     try {
       switch (type) {
@@ -150,7 +178,6 @@ export default function Dashboard() {
           break;
 
         case 'FORECAST':
-          // Use real data if available, otherwise use dummy data
           if (transactions.length > 0) {
             fetchForecastWithRealData();
           } else {
@@ -166,7 +193,6 @@ export default function Dashboard() {
           if (bankConnected) {
             fetchRealTransactions();
           } else {
-            // Show dummy transactions
             const txRes = await axios.get('/transactions', {
               headers: { Authorization: `Bearer ${token}` },
             });
@@ -179,11 +205,14 @@ export default function Dashboard() {
       }
     } catch (err) {
       console.error(err);
-      alert('Something went wrong: ' + (err.response?.data?.detail || err.message));
+      if (err.response?.status === 401) {
+        logout();
+      } else {
+        alert('Something went wrong: ' + (err.response?.data?.detail || err.message));
+      }
     }
   };
 
-  // Handle successful bank connection
   const handleBankConnected = () => {
     setBankConnected(true);
     alert('Bank account connected successfully! You can now fetch real transaction history.');
@@ -235,20 +264,20 @@ export default function Dashboard() {
         </div>
 
         <div className="action-grid">
-          <button className="action-btn" onClick={() => handleAction('ADVICE')}>GENERATE<br />ADVICE</button>
-	  <button className="action-btn" onClick={() => handleAction('FORECAST')}>
-  	    <>
-    	      GET<br />FORECAST
-    	      {transactions.length > 0 && <><br /><small>(REAL DATA)</small></>}
-  	   </>
-	</button>
-          <button className="action-btn" onClick={() => handleAction('RISK')}>GET<br />RISK</button>
-	  <button className="action-btn" onClick={() => handleAction('TRANSACTIONS')}>
-  	    <>
-    	      GET<br />TRANSACTION HISTORY
-    	      {bankConnected && <><br /><small>(REAL DATA)</small></>}
-  	   </>
-	</button>
+          <button className="action-btn" onClick={() => handleAction('ADVICE')}>
+            GENERATE<br />ADVICE
+          </button>
+          <button className="action-btn" onClick={() => handleAction('FORECAST')}>
+            GET<br />FORECAST
+            {transactions.length > 0 && <><br /><small>(REAL DATA)</small></>}
+          </button>
+          <button className="action-btn" onClick={() => handleAction('RISK')}>
+            GET<br />RISK
+          </button>
+          <button className="action-btn" onClick={() => handleAction('TRANSACTIONS')}>
+            GET<br />TRANSACTION HISTORY
+            {bankConnected && <><br /><small>(REAL DATA)</small></>}
+          </button>
         </div>
 
         {showChat && (
@@ -263,19 +292,19 @@ export default function Dashboard() {
           <div className="text-center text-lg font-medium mt-8">Loading forecast...</div>
         )}
 
-{forecast && forecast.dailyBreakdown?.length > 0 && (
-  <div className="mt-8">
-    <div className="text-center text-xl font-bold mb-2">
-      Total Forecasted Spend: ₹{forecast.totalForecast}
-      {transactions.length > 0 && (
-        <span style={{ color: '#00ff00', fontSize: '14px', display: 'block' }}>
-          (Based on {transactions.length} real transactions)
-        </span>
-      )}
-    </div>
-    <ForecastChart forecastData={forecast.dailyBreakdown} />
-  </div>
-)}
+        {forecast && forecast.dailyBreakdown?.length > 0 && (
+          <div className="mt-8">
+            <div className="text-center text-xl font-bold mb-2">
+              Total Forecasted Spend: ₹{forecast.totalForecast}
+              {transactions.length > 0 && (
+                <span style={{ color: '#00ff00', fontSize: '14px', display: 'block' }}>
+                  (Based on {transactions.length} real transactions)
+                </span>
+              )}
+            </div>
+            <ForecastChart forecastData={forecast.dailyBreakdown} />
+          </div>
+        )}
       </main>
 
       <footer className="footer">

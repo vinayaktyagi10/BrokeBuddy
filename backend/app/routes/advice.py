@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Dict
 import httpx
-from app.routes.auth import get_current_user  # JWT user auth
+from app.utils.auth_utils import get_current_user  # ✅ Fixed import
 from app.schemas.advice import ChatRequest
 
 router = APIRouter()
@@ -28,20 +28,29 @@ async def chat_with_llama(
     request: ChatRequest,
     user: dict = Depends(get_current_user)
 ):
+    """Chat with AI financial advisor"""
     full_messages = [
         {"role": "system", "content": BANK_CONTEXT}
     ] + [msg.dict() for msg in request.messages]
 
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:  # ✅ Add timeout
             res = await client.post(OLLAMA_URL, json={
                 "model": "llama3",
                 "messages": full_messages,
                 "stream": False
             })
+            
+            if res.status_code != 200:
+                raise HTTPException(status_code=500, detail=f"Ollama API error: {res.status_code}")
+                
         llama_response = res.json()
         content = llama_response.get("message", {}).get("content", "No response from Llama.")
         return {"message": content}
 
+    except httpx.RequestError as e:
+        print(f"Request error: {e}")
+        raise HTTPException(status_code=503, detail="AI service unavailable")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
