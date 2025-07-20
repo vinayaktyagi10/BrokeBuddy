@@ -5,10 +5,10 @@ BrokeBuddy is a chat-first, AI-powered financial sidekick that helps users manag
 🧠 It uses **LLaMA 3 via Ollama** on the backend and provides an interactive chat interface built with React.
 
 ![Login Screen](Pictures/shot_1751027692.png)  
-*Figure 1: User Login Interface*
+_Figure 1: User Login Interface_
 
 ![Account Creation](Pictures/shot_1751027701.png)  
-*Figure 2: New User Registration*
+_Figure 2: New User Registration_
 
 ---
 
@@ -54,9 +54,9 @@ Then run:
 uvicorn app.main:app --reload
 ```
 
-Backend runs at: http://localhost:8000
+Backend runs at: <http://localhost:8000>
 
-Test it via: http://localhost:8000/docs
+Test it via: <http://localhost:8000/docs>
 
 ⚠️ **Make sure Ollama and LLaMA 3 are installed and running:**
 
@@ -72,25 +72,29 @@ npm install
 npm run dev
 ```
 
-Frontend runs at: http://localhost:5173
+Frontend runs at: <http://localhost:5173>
 
 ---
 
 ## 💬 Chat Features
+
 ![Figure 3: Main Dashboard with Financial Options](Pictures/1.png)
-*Figure 3: Main Dashboard with Financial Options*
+_Figure 3: Main Dashboard with Financial Options_
 
 ![Figure 4: Sample Conversation with Financial Advice](Pictures/2.png)
-*Figure 4: Sample Conversation with Financial Advice*
+_Figure 4: Sample Conversation with Financial Advice_
+
 - Ask BrokeBuddy for financial tips
 - Friendly tone + casual replies
 - Stateless messages (currently)
 - Backend integration with Ollama AI
 
 ---
-##📊 Forecasting Features
+
+## 📊 Forecasting Features
+
 ![Figure 5: 30-Day Spending Forecast Visualization](Pictures/3.png)
-*Figure 5: 30-Day Spending Forecast Visualization*
+_Figure 5: 30-Day Spending Forecast Visualization_
 
 AI-powered spending predictions
 
@@ -99,6 +103,7 @@ Visual chart representation
 Monthly budget tracking
 
 ---
+
 ## 📂 Project Structure
 
 ```
